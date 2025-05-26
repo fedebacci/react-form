@@ -1,8 +1,9 @@
 import { useState } from "react"
 import articles from "../../assets/js/data/data"
+import ArticleElement from "../ui/ArticleElement"
 
 export default function Main () {
-    const [articlesStateValue, addNewArticle] = useState([...articles]);
+    const [articlesStateValue, setArticles] = useState([...articles]);
     const [newArticleTitle, setNewArticleTitle] = useState("");
 
     const handleFormSubmit = (e) => {
@@ -12,12 +13,22 @@ export default function Main () {
         let maximumId = 0;
         for (const article of articlesStateValue) if (article.id > maximumId) maximumId = article.id;
         
-        addNewArticle([...articlesStateValue, {
+        setArticles([...articlesStateValue, {
             id: maximumId + 1,
             title: newArticleTitle
         }]);
         setNewArticleTitle("");
     };
+
+    const deleteArticle = (id) => {
+        console.info(`Cancello articolo: ${id}`);
+        console.info(typeof(id));
+
+        const articleToDelete = articlesStateValue.find(article => article.id === parseInt(id));
+        const newArticlesStateValue = [...articlesStateValue]
+        newArticlesStateValue.splice(newArticlesStateValue.indexOf(articleToDelete), 1);
+        setArticles(newArticlesStateValue);
+    }
 
     return (
         <main className="py-5">
@@ -54,9 +65,21 @@ export default function Main () {
                     {
                         articlesStateValue.map(article => {
                             return (
-                                <li className="list-group-item" key={article.id}>
+
+
+                                <li key={article.id} className="list-group-item d-flex justify-content-between align-items-center">
                                     {article.title}
+                                    <button onClick={(e) => deleteArticle(e.target.dataset.id)} className="btn btn-danger" data-id={article.id}>
+                                        X
+                                    </button>
                                 </li>
+
+
+
+
+                                // <ArticleElement key={article.id} article={article}>
+                                //     {/* <p className="mb-0"><strong>{article.title}</strong> ({article.id})</p> */}
+                                // </ArticleElement>
                             );
                         })
                     }
