@@ -1,6 +1,5 @@
 import { useState } from "react"
 import articles from "../../assets/js/data/data"
-import ArticleElement from "../ui/ArticleElement"
 
 export default function Main () {
     const [articlesStateValue, setArticles] = useState([...articles]);
@@ -9,6 +8,8 @@ export default function Main () {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+
+        if (newArticleTitle.length === 0) return alert('Il titolo deve avere almeno un carattere');
 
         // * TMP CREAZIONE AL VOLO DI UN NUOVO ID PER L'ARTICOLO
         let maximumId = 0;
@@ -33,8 +34,8 @@ export default function Main () {
 
 
     const showModifyArticle = (id) => {
-        console.info(`Modifico articolo: ${id}`);
-        console.info(typeof(id));
+        // console.info(`Modifico articolo: ${id}`);
+        // console.info(typeof(id));
 
         const modifyArticleTitleEl = document.getElementById('articleTitleModifier');
         modifyArticleTitleEl.classList.remove('d-none');
@@ -46,11 +47,15 @@ export default function Main () {
     const modifyArticle = (e) => {
         e.preventDefault();
 
-        console.info(`Modifico articolo, e.target`, e.target);
-        console.info(`Modifico articolo, e.target.dataset.id`, e.target.dataset.id);
-        console.info(`Modifico articolo, modifiedArticleTitle`, modifiedArticleTitle);
+        if (modifiedArticleTitle.length === 0) return alert('Il titolo deve avere almeno un carattere');
+
+        // console.info(`Modifico articolo, e.target`, e.target);
+        // console.info(`Modifico articolo, e.target.dataset.id`, e.target.dataset.id);
+        // console.info(`Modifico articolo, modifiedArticleTitle`, modifiedArticleTitle);
 
         const articleToModify = articlesStateValue.find(article => article.id === parseInt(e.target.dataset.id));
+        if (modifiedArticleTitle === articleToModify.title) return alert('Il titolo deve essere differente da quello precedente');
+
         const newArticlesStateValue = [...articlesStateValue];
         newArticlesStateValue.splice(newArticlesStateValue.indexOf(articleToModify), 1, {id: articleToModify.id, title: modifiedArticleTitle});
         setArticles(newArticlesStateValue);
@@ -67,6 +72,7 @@ export default function Main () {
                 <form onSubmit={(e) => handleFormSubmit(e)}>
                     <div className="input-group mb-3">
                         <input 
+                        autoFocus
                         onChange={(e) => setNewArticleTitle(e.target.value)}
                         value={newArticleTitle}
 
@@ -105,17 +111,10 @@ export default function Main () {
                                             Modify
                                         </button>
                                         <button onClick={(e) => deleteArticle(e.target.dataset.id)} className="btn btn-danger" data-id={article.id}>
-                                            X
+                                            Delete
                                         </button>
                                     </div>
                                 </li>
-
-
-
-
-                                // <ArticleElement key={article.id} article={article}>
-                                //     {/* <p className="mb-0"><strong>{article.title}</strong> ({article.id})</p> */}
-                                // </ArticleElement>
                             );
                         })
                     }
@@ -127,6 +126,18 @@ export default function Main () {
 
             <div id="articleTitleModifier" className="d-none">
                 <div className="container">
+
+                    <button
+                    onClick={() => {
+                        const modifyArticleTitleEl = document.getElementById('articleTitleModifier');
+                        modifyArticleTitleEl.classList.add('d-none');
+                    }}
+                    className="btn btn-danger mb-3"
+                    type="button"
+                    id="closeTitleModification">
+                        X
+                    </button>
+
                     <form onSubmit={(e) => modifyArticle(e)} className="w-100">
                         <div className="input-group">
                             <input
